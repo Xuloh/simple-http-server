@@ -28,10 +28,10 @@ public class WorkerThread extends Thread {
         try {
             HTTPRequest request = new HTTPRequest();
             request.fromInputStream(this.socket.getInputStream());
-
             LOGGER.info("Received request : {} {}", request.getMethod(), request.getResource());
 
             HTTPResponse response = this.requestHandler.handleRequest(request);
+            LOGGER.info("Sending response : {}", response.getStatus());
             response.toOutputStream(this.socket.getOutputStream());
 
             this.socket.close();
