@@ -14,7 +14,6 @@ public class SimpleHandler {
     public HTTPResponse handleGet(HTTPRequest request) {
         HTTPResponse response = new HTTPResponse(HTTPStatus.OK);
         response.setBody("<h1>It works !</h1>");
-        throw new NullPointerException("lol");
-//        return response;
+        return response;
     }
 }
