@@ -12,6 +12,8 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 public abstract class HTTPMessage {
+    public static HTTPVersion defaultVersion = HTTPVersion.HTTP1;
+
     protected HTTPVersion version;
 
     protected Map<String, String> headers;
@@ -19,7 +21,7 @@ public abstract class HTTPMessage {
     protected byte[] body;
 
     protected HTTPMessage(HTTPVersion version) {
-        this.version = version;
+        this.version = version == null ? defaultVersion : version;
         this.headers = new HashMap<>();
         this.body = null;
     }
