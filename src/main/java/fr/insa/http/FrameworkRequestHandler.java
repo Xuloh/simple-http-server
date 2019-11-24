@@ -6,6 +6,7 @@ import fr.insa.http.enums.HTTPMethod;
 import fr.insa.http.enums.HTTPStatus;
 import fr.insa.http.messages.HTTPRequest;
 import fr.insa.http.messages.HTTPResponse;
+import fr.insa.http.util.HTTPHeaders;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.reflections.Reflections;
@@ -15,6 +16,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -27,11 +29,14 @@ public class FrameworkRequestHandler implements RequestHandler {
     private List<Method> handlerMethods;
 
     private Map<HTTPMethod, Method> defaultMethods;
+
+    private HTTPHeaders defaultHeaders;
     
     public FrameworkRequestHandler() {
         Reflections reflections = new Reflections("fr.insa.http");
         Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(HTTPHandler.class);
         this.defaultMethods = new EnumMap<>(HTTPMethod.class);
+        this.defaultHeaders = new HTTPHeaders();
         
         if(annotated.size() == 0)
             LOGGER.warn("No class annotated with @HTTPHandler could be found");
@@ -77,20 +82,32 @@ public class FrameworkRequestHandler implements RequestHandler {
         }
     }
 
+    public HTTPHeaders getDefaultHeaders() {
+        return this.defaultHeaders;
+    }
+
     @Override
     public HTTPResponse handleRequest(HTTPRequest request) {
         Method handlerMethod = this.defaultMethods.get(request.getMethod());
+        HTTPResponse response;
         if(handlerMethod == null)
-            return this.noHandlerMethod(request);
+            response = this.noHandlerMethod(request);
         else {
             try {
-                return (HTTPResponse)handlerMethod.invoke(this.handlerInstance, request);
+                response = (HTTPResponse)handlerMethod.invoke(this.handlerInstance, request);
             }
             catch(IllegalAccessException | InvocationTargetException e) {
                 LOGGER.error("An error occurred while invoking handler method", e);
-                return this.errorResponse(e);
+                response = this.errorResponse(e);
             }
         }
+
+        for(String header : this.defaultHeaders.headers()) {
+            if(!response.getHeaders().hasHeader(header))
+                response.getHeaders().setHeader(header, this.defaultHeaders.getHeader(header));
+        }
+
+        return response;
     }
 
     private HTTPResponse noHandlerMethod(HTTPRequest request) {
