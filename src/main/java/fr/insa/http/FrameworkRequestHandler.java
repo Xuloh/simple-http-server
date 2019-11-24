@@ -82,7 +82,7 @@ public class FrameworkRequestHandler implements RequestHandler {
         }
     }
 
-    public HTTPHeaders getDefaultHeaders() {
+    public HTTPHeaders defaultHeaders() {
         return this.defaultHeaders;
     }
 
