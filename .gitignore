@@ -1,5 +1,5 @@
 .idea
-src/main/resources/www
+www
 
 # Created by https://www.gitignore.io/api/java,gradle,intellij
 # Edit at https://www.gitignore.io/?templates=java,gradle,intellij
