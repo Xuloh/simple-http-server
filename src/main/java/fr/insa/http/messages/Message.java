@@ -1,4 +1,6 @@
-package fr.insa.http.util;
+package fr.insa.http.messages;
+
+import fr.insa.http.enums.Version;
 
 import java.io.IOException;
 import java.io.InputStream;

@@ -1,5 +1,7 @@
-package fr.insa.http.util;
+package fr.insa.http.messages;
 
+import fr.insa.http.enums.Method;
+import fr.insa.http.enums.Version;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -8,7 +10,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.PrintStream;
 
 public class Request extends Message {
     private static final Logger LOGGER = LogManager.getLogger(Request.class);

@@ -1,5 +1,7 @@
-package fr.insa.http.util;
+package fr.insa.http.messages;
 
+import fr.insa.http.enums.Status;
+import fr.insa.http.enums.Version;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

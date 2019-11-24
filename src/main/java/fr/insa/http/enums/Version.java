@@ -1,4 +1,4 @@
-package fr.insa.http.util;
+package fr.insa.http.enums;
 
 public enum Version {
     HTTP1("HTTP/1.1"),

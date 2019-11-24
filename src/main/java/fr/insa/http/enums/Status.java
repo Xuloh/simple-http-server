@@ -1,4 +1,4 @@
-package fr.insa.http.util;
+package fr.insa.http.enums;
 
 public enum Status {
     // Information responses
