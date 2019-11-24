@@ -22,7 +22,7 @@
     </Appenders>
 
     <Loggers>
-        <Root level="debug">
+        <Root level="trace">
             <AppenderRef ref="Errors"/>
             <AppenderRef ref="Info"/>
         </Root>
