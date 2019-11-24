@@ -39,6 +39,8 @@ public class HTTPRequest extends HTTPMessage {
     public HTTPRequest setMethod(HTTPMethod method) {
         if(method == null)
             throw new NullPointerException("null method forbidden");
+        if(method == HTTPMethod.ANY)
+            throw new IllegalArgumentException("ANY method not permitted");
         this.method = method;
         return this;
     }
