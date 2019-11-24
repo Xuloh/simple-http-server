@@ -15,5 +15,5 @@ dependencies {
 }
 
 application {
-    mainClassName = 'fr.insa.http.App'
+    mainClassName = 'fr.insa.http.Server'
 }
