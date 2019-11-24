@@ -79,7 +79,7 @@ public enum HTTPStatus {
 
     @Override
     public String toString() {
-        return this.statusCode + ' ' + this.statusMessage;
+        return Integer.toString(this.statusCode) + ' ' + this.statusMessage;
     }
 
     public static HTTPStatus fromCode(int statusCode) {

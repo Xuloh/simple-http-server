@@ -94,9 +94,7 @@ public class HTTPResponse extends HTTPMessage {
         StringBuilder stringBuilder = new StringBuilder()
             .append(this.version)
             .append(' ')
-            .append(this.status.getCode())
-            .append(' ')
-            .append(this.status.getMessage())
+            .append(this.status)
             .append("\r\n");
 
         for(String header : this.headers.keySet())
