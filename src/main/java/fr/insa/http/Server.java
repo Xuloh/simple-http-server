@@ -15,7 +15,7 @@ public class Server {
         LOGGER.info("Starting server on port {}", port);
         try {
             ServerSocket serverSocket = new ServerSocket(port);
-            FrameworkRequestHandler requestHandler = new FrameworkRequestHandler();
+            RequestHandler requestHandler = createRequestHandler();
             while(true) {
                 Socket socket = serverSocket.accept();
                 new WorkerThread(socket, requestHandler).start();
@@ -24,5 +24,12 @@ public class Server {
         catch(IOException e) {
             LOGGER.error(e.getMessage(), e);
         }
+    }
+
+    public static RequestHandler createRequestHandler() {
+        FrameworkRequestHandler requestHandler = new FrameworkRequestHandler();
+        requestHandler.defaultHeaders().setHeader("content-type", "text/html");
+        requestHandler.defaultHeaders().setHeader("server", "Simple HTTP Server");
+        return requestHandler;
     }
 }
