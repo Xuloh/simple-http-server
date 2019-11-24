@@ -46,4 +46,9 @@ public class HTTPHeaders {
     public void clear() {
         this.headers.clear();
     }
+
+    @Override
+    public String toString() {
+        return "HTTPHeaders{" + "headers=" + headers + '}';
+    }
 }
