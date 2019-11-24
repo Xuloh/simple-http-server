@@ -60,8 +60,8 @@ public class HTTPRequest extends HTTPMessage {
 
     @Override
     public String toString() {
-        return "Request{" + "method=" + method + ", version=" + version + ", resource='" + resource + '\'' + ", headers=" + headers + ", body='" + new String(
-            body) + '\'' + '}';
+        String body = this.body == null ? "null" : new String(this.body);
+        return "Request{" + "method=" + method + ", version=" + version + ", resource='" + resource + '\'' + ", headers=" + headers + ", body='" + body + '\'' + '}';
     }
 
     @Override
