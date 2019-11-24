@@ -5,11 +5,13 @@ import fr.insa.http.enums.HTTPVersion;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.xml.crypto.Data;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.SocketTimeoutException;
 
 public class HTTPRequest extends HTTPMessage {
     private static final Logger LOGGER = LogManager.getLogger(HTTPRequest.class);
@@ -90,13 +92,29 @@ public class HTTPRequest extends HTTPMessage {
                 this.headers.setHeader(split[0], split[1]);
             }
 
+            LOGGER.trace("Request so far : {}", this.toString());
             // parse body (if any)
             if(this.headers.hasHeader("content-length")) {
                 int contentLength = Integer.parseInt(this.headers.getHeader("content-length"));
                 byte[] bodyData = new byte[contentLength];
-                int dataRead = in.read(bodyData, 0, contentLength);
-                if(dataRead != contentLength)
-                    throw new IllegalArgumentException("got content length " + dataRead + ", expected " + contentLength);
+                int totalDataReceived = 0;
+                int dataRead;
+                try {
+                    do {
+                        dataRead = in.read(bodyData, totalDataReceived, contentLength - totalDataReceived);
+                        if(dataRead > -1)
+                            totalDataReceived += dataRead;
+                        LOGGER.trace("Read {}, total received {}, total needed {}",
+                            dataRead,
+                            totalDataReceived,
+                            contentLength
+                        );
+                    }
+                    while(dataRead > 0);
+                }
+                catch(SocketTimeoutException ignored) {}
+//                if(totalDataReceived != contentLength)
+//                    throw new IllegalArgumentException("got content length " + totalDataReceived + ", expected " + contentLength);
                 this.setBody(bodyData);
             }
         }
