@@ -1,6 +1,6 @@
 package fr.insa.http.enums;
 
-public enum Status {
+public enum HTTPStatus {
     // Information responses
     CONTINUE(100, "Continue"),
     SWITCHING_PROTCOL(101, "Switching Protocol"),
@@ -64,7 +64,7 @@ public enum Status {
 
     private String statusMessage;
 
-    Status(int statusCode, String statusMessage) {
+    HTTPStatus(int statusCode, String statusMessage) {
         this.statusCode = statusCode;
         this.statusMessage = statusMessage;
     }
@@ -82,7 +82,7 @@ public enum Status {
         return this.statusCode + ' ' + this.statusMessage;
     }
 
-    public static Status fromCode(int statusCode) {
+    public static HTTPStatus fromCode(int statusCode) {
         switch(statusCode) {
             case 100:
                 return CONTINUE;
@@ -187,11 +187,11 @@ public enum Status {
         }
     }
 
-    public static Status fromString(String string) {
+    public static HTTPStatus fromString(String string) {
         String[] split = string.split(" ", 2);
         try {
             int code = Integer.parseInt(split[0]);
-            Status status = fromCode(code);
+            HTTPStatus status = fromCode(code);
             if(!status.statusMessage.equals(split[1]))
                 throw new IllegalArgumentException("Invalid status message : " + split[1]);
             return status;

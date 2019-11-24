@@ -1,12 +1,12 @@
 package fr.insa.http.enums;
 
-public enum Version {
+public enum HTTPVersion {
     HTTP1("HTTP/1.1"),
     HTTP2("HTTP/2");
 
     private String str;
 
-    Version(String str) {
+    HTTPVersion(String str) {
         this.str = str;
     }
 
@@ -15,7 +15,7 @@ public enum Version {
         return str;
     }
 
-    public static Version fromString(String name) {
+    public static HTTPVersion fromString(String name) {
         if(name == null)
             throw new NullPointerException("Name is null");
 

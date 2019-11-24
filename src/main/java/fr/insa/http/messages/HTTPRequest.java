@@ -1,7 +1,7 @@
 package fr.insa.http.messages;
 
-import fr.insa.http.enums.Status;
-import fr.insa.http.enums.Version;
+import fr.insa.http.enums.HTTPMethod;
+import fr.insa.http.enums.HTTPVersion;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -11,38 +11,55 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 
-public class Response extends Message {
-    private static final Logger LOGGER = LogManager.getLogger(Response.class);
+public class HTTPRequest extends HTTPMessage {
+    private static final Logger LOGGER = LogManager.getLogger(HTTPRequest.class);
 
-    private Status status;
+    private HTTPMethod method;
 
-    public Response() {
-        this(null, null);
+    private String resource;
+
+    public HTTPRequest() {
+        this(null, null, null);
     }
 
-    public Response(Status status) {
-        this(status, null);
+    public HTTPRequest(HTTPMethod method, String resource) {
+        this(method, resource, HTTPVersion.HTTP1);
     }
 
-    public Response(Status status, Version version) {
+    public HTTPRequest(HTTPMethod method, String resource, HTTPVersion version) {
         super(version);
-        this.status = status;
+        this.method = method;
+        this.resource = resource;
     }
 
-    public Status getStatus() {
-        return this.status;
+    public HTTPMethod getMethod() {
+        return this.method;
     }
 
-    public Response setStatus(Status status) {
-        if(status == null)
-            throw new NullPointerException("null status forbidden");
-        this.status = status;
+    public HTTPRequest setMethod(HTTPMethod method) {
+        if(method == null)
+            throw new NullPointerException("null method forbidden");
+        this.method = method;
+        return this;
+    }
+
+    public String getResource() {
+        return this.resource;
+    }
+
+    public HTTPRequest setResource(String resource) {
+        if(resource == null)
+            throw new NullPointerException("null resource forbidden");
+        if(resource.length() == 0)
+            throw new IllegalArgumentException("empty resource forbidden");
+        this.resource = resource;
         return this;
     }
 
     @Override
     public String toString() {
-        return "Response{" + "version=" + version + ", status=" + status + ", headers=" + headers + ", body='" + body + '\'' + '}';
+        return "Request{" + "method=" + method + ", version=" + version + ", resource='" + resource + '\'' + ", headers=" + headers + ", body='" + new String(
+            body) + '\'' + '}';
     }
 
     @Override
@@ -51,15 +68,17 @@ public class Response extends Message {
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 
         String line = reader.readLine();
-        String[] split = line.split(" ", 2);
+        int firstIdx = line.indexOf(' ');
+        int lastIdx = line.lastIndexOf(' ');
 
         try {
-            this.version = Version.fromString(split[0]);
-            this.status = Status.fromString(split[1]);
+            this.method = HTTPMethod.valueOf(line.substring(0, firstIdx));
+            this.resource = line.substring(firstIdx + 1, lastIdx);
+            this.version = HTTPVersion.fromString(line.substring(lastIdx + 1));
 
             // parse headers
             while((line = reader.readLine()) != null && line.length() > 0) {
-                split = line.split(":", 2);
+                String[] split = line.split(":", 2);
 
                 // ignore malformed lines
                 if(split.length != 2) {
@@ -86,17 +105,19 @@ public class Response extends Message {
 
     @Override
     public void toOutputStream(OutputStream out) throws IOException {
+        if(this.method == null)
+            throw new NullPointerException("method is null !");
+        if(this.resource == null)
+            throw new NullPointerException("resource is null !");
         if(this.version == null)
             throw new NullPointerException("version is null !");
-        if(this.status == null)
-            throw new NullPointerException("status is null !");
 
         StringBuilder stringBuilder = new StringBuilder()
+            .append(this.method)
+            .append(' ')
+            .append(this.resource)
+            .append(' ')
             .append(this.version)
-            .append(' ')
-            .append(this.status.getCode())
-            .append(' ')
-            .append(this.status.getMessage())
             .append("\r\n");
 
         for(String header : this.headers.keySet())
@@ -116,6 +137,7 @@ public class Response extends Message {
     @Override
     protected void clear() {
         super.clear();
-        this.status = null;
+        this.method = null;
+        this.resource = null;
     }
 }

@@ -1,6 +1,6 @@
 package fr.insa.http.messages;
 
-import fr.insa.http.enums.Version;
+import fr.insa.http.enums.HTTPVersion;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,14 +11,14 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-public abstract class Message {
-    protected Version version;
+public abstract class HTTPMessage {
+    protected HTTPVersion version;
 
     protected Map<String, String> headers;
 
     protected byte[] body;
 
-    protected Message(Version version) {
+    protected HTTPMessage(HTTPVersion version) {
         this.version = version;
         this.headers = new HashMap<>();
         this.body = null;
@@ -28,11 +28,11 @@ public abstract class Message {
 
     public abstract void toOutputStream(OutputStream out) throws IOException;
 
-    public Version getVersion() {
+    public HTTPVersion getVersion() {
         return this.version;
     }
 
-    public void setVersion(Version version) {
+    public void setVersion(HTTPVersion version) {
         if(version == null)
             throw new NullPointerException("null version forbidden");
         this.version = version;

@@ -1,6 +1,6 @@
 package fr.insa.http.enums;
 
-public enum Method {
+public enum HTTPMethod {
     GET,
     HEAD,
     POST,
