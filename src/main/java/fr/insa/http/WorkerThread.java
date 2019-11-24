@@ -7,6 +7,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketException;
 
 public class WorkerThread extends Thread {
     private static final Logger LOGGER = LogManager.getLogger(WorkerThread.class);
@@ -17,9 +18,10 @@ public class WorkerThread extends Thread {
 
     private RequestHandler requestHandler;
 
-    public WorkerThread(Socket socket, RequestHandler requestHandler) {
+    public WorkerThread(Socket socket, RequestHandler requestHandler) throws SocketException {
         super("WorkerThread-" + workerCount++);
         this.socket = socket;
+        LOGGER.debug("Socket info - SO_RCVBUF={}", this.socket.getReceiveBufferSize());
         this.requestHandler = requestHandler;
     }
 
