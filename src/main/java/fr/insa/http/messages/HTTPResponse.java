@@ -66,12 +66,12 @@ public class HTTPResponse extends HTTPMessage {
                     LOGGER.debug("Got malformed line : {}", line);
                     continue;
                 }
-                this.setHeader(split[0], split[1]);
+                this.headers.setHeader(split[0], split[1]);
             }
 
             // parse body (if any)
-            if(this.hasHeader("content-length")) {
-                int contentLength = Integer.parseInt(this.getHeader("content-length"));
+            if(this.headers.hasHeader("content-length")) {
+                int contentLength = Integer.parseInt(this.headers.getHeader("content-length"));
                 byte[] bodyData = new byte[contentLength];
                 int dataRead = in.read(bodyData, 0, contentLength);
                 if(dataRead != contentLength)
@@ -97,8 +97,8 @@ public class HTTPResponse extends HTTPMessage {
             .append(this.status)
             .append("\r\n");
 
-        for(String header : this.headers.keySet())
-            stringBuilder.append(header).append(':').append(this.headers.get(header)).append("\r\n");
+        for(String header : this.headers.headers())
+            stringBuilder.append(header).append(':').append(this.headers.getHeader(header)).append("\r\n");
         stringBuilder.append("\r\n");
 
         byte[] data = stringBuilder.toString().getBytes();

@@ -1,28 +1,23 @@
 package fr.insa.http.messages;
 
 import fr.insa.http.enums.HTTPVersion;
+import fr.insa.http.util.HTTPHeaders;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Set;
 
 public abstract class HTTPMessage {
     public static HTTPVersion defaultVersion = HTTPVersion.HTTP1;
 
     protected HTTPVersion version;
 
-    protected Map<String, String> headers;
-
+    protected HTTPHeaders headers;
     protected byte[] body;
 
     protected HTTPMessage(HTTPVersion version) {
         this.version = version == null ? defaultVersion : version;
-        this.headers = new HashMap<>();
+        this.headers = new HTTPHeaders();
         this.body = null;
     }
 
@@ -40,34 +35,8 @@ public abstract class HTTPMessage {
         this.version = version;
     }
 
-    public void setHeader(String header, String value) {
-        if(header == null)
-            throw new NullPointerException("null header forbidden");
-        if(value == null)
-            this.headers.remove(header);
-        else {
-            header = header.toLowerCase();
-            value = value.stripLeading();
-            this.headers.put(header, value);
-        }
-    }
-
-    public boolean hasHeader(String header) {
-        if(header == null)
-            throw new NullPointerException("null header forbidden");
-        return this.headers.containsKey(header);
-    }
-
-    public String getHeader(String header) {
-        if(header == null)
-            throw new NullPointerException("null header forbidden");
-        if(!this.headers.containsKey(header))
-            throw new NoSuchElementException("no value for header " + header);
-        return this.headers.get(header);
-    }
-
-    public Set<String> headers() {
-        return Collections.unmodifiableSet(this.headers.keySet());
+    public HTTPHeaders getHeaders() {
+        return this.headers;
     }
 
     public String getBodyAsString() {
