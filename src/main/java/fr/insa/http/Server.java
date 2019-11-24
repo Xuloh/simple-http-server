@@ -11,6 +11,7 @@ public class Server {
     private static final Logger LOGGER = LogManager.getLogger(Server.class);
 
     public static void main(String[] args) {
+        System.setProperty("line.separator", "\r\n");
         int port = 8080;
         LOGGER.info("Starting server on port {}", port);
         try {
@@ -18,6 +19,7 @@ public class Server {
             RequestHandler requestHandler = createRequestHandler();
             while(true) {
                 Socket socket = serverSocket.accept();
+                socket.setSoTimeout(1000);
                 new WorkerThread(socket, requestHandler).start();
             }
         }
