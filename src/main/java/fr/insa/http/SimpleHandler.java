@@ -6,16 +6,20 @@ import fr.insa.http.enums.HTTPMethod;
 import fr.insa.http.enums.HTTPStatus;
 import fr.insa.http.messages.HTTPRequest;
 import fr.insa.http.messages.HTTPResponse;
+import fr.insa.http.util.Util;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.zip.GZIPInputStream;
 
 @HTTPHandler
 public class SimpleHandler {
@@ -38,7 +42,7 @@ public class SimpleHandler {
                 return response;
             }
             else if("/gif-gallery.html".equals(resource)) {
-                byte[] data = this.readFileFromResources(this.root + resource);
+                byte[] data = this.readFile(this.root + resource);
                 File gifDir = new File(this.root + "/gif");
                 StringBuilder stringBuilder = new StringBuilder();
                 Arrays.stream(Objects.requireNonNull(gifDir.list()))
@@ -46,9 +50,7 @@ public class SimpleHandler {
                       .forEach(stringBuilder::append);
                 stringBuilder.append("</div></body></html>");
                 byte[] moreData = stringBuilder.toString().getBytes();
-                byte[] allTheData = new byte[data.length + moreData.length];
-                System.arraycopy(data, 0, allTheData, 0, data.length);
-                System.arraycopy(moreData, 0, allTheData, data.length, moreData.length);
+                byte[] allTheData = Util.concatenateArrays(data, moreData);
 
                 HTTPResponse response = new HTTPResponse(HTTPStatus.OK);
                 response.getHeaders().setHeader("length", Integer.toString(allTheData.length));
@@ -56,7 +58,7 @@ public class SimpleHandler {
                 return response;
             }
             else {
-                byte[] data = this.readFileFromResources(this.root + resource);
+                byte[] data = this.readFile(this.root + resource);
                 String contentType = this.getFileContentType(this.root + resource);
                 HTTPResponse response = new HTTPResponse(HTTPStatus.OK);
                 if(contentType != null)
@@ -75,13 +77,15 @@ public class SimpleHandler {
     public HTTPResponse handlePost(HTTPRequest request) throws IOException {
         if("/gif".equals(request.getResource())) {
             UUID uuid = UUID.randomUUID();
-            this.writeToFileInResources(this.root + "/gif/" + uuid.toString() + ".gif", request.getBody());
+            Base64.Decoder base64 = Base64.getDecoder();
+            byte[] data = base64.decode(request.getBody());
+            this.writeToFile(this.root + "/gif/" + uuid.toString() + ".gif", data);
             return new HTTPResponse(HTTPStatus.OK);
         }
         return this.notFound();
     }
 
-    private byte[] readFileFromResources(String path) throws IOException {
+    private byte[] readFile(String path) throws IOException {
         File requestedFile = new File(path);
         if(!requestedFile.exists() || !requestedFile.canRead())
             throw new FileNotFoundException("File " + requestedFile + " does not exist or is not readable");
@@ -89,9 +93,25 @@ public class SimpleHandler {
         return Files.readAllBytes(requestedFile.toPath());
     }
 
-    private void writeToFileInResources(String path, byte[] data) throws IOException {
+    private void writeToFile(String path, byte[] data) throws IOException {
+        this.writeToFile(path, data, false);
+    }
+
+    private void writeToFile(String path, byte[] data, boolean gzip) throws IOException {
+        byte[] fileData = new byte[0];
+        if(gzip) {
+            GZIPInputStream gzipIn = new GZIPInputStream(new ByteArrayInputStream(data));
+            byte[] buffer = new byte[1024];
+            int count = gzipIn.read(buffer, 0, buffer.length);
+            do {
+                fileData = Util.concatenateArrays(fileData, 0, fileData.length, buffer, 0, count);
+                count = gzipIn.read(buffer, 0, buffer.length);
+            } while(count != -1);
+        }
+        else
+            fileData = data;
         File targetFile = new File(path);
-        Files.write(targetFile.toPath(), data);
+        Files.write(targetFile.toPath(), fileData);
     }
 
     private String getFileContentType(String path) throws IOException {
