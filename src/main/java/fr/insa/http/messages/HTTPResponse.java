@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 
 public class HTTPResponse extends HTTPMessage {
     private static final Logger LOGGER = LogManager.getLogger(HTTPResponse.class);
@@ -48,7 +49,7 @@ public class HTTPResponse extends HTTPMessage {
     @Override
     public void fromInputStream(InputStream in) throws IOException {
         this.clear();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.US_ASCII));
 
         String line = reader.readLine();
         String[] split = line.split(" ", 2);
@@ -101,7 +102,7 @@ public class HTTPResponse extends HTTPMessage {
             stringBuilder.append(header).append(':').append(this.headers.getHeader(header)).append("\r\n");
         stringBuilder.append("\r\n");
 
-        byte[] data = stringBuilder.toString().getBytes();
+        byte[] data = stringBuilder.toString().getBytes(StandardCharsets.US_ASCII);
         out.write(data, 0, data.length);
 
         if(this.body != null) {
