@@ -21,7 +21,7 @@ public class WorkerThread extends Thread {
     public WorkerThread(Socket socket, RequestHandler requestHandler) throws SocketException {
         super("WorkerThread-" + workerCount++);
         this.socket = socket;
-        LOGGER.debug("Socket info - SO_RCVBUF={}", this.socket.getReceiveBufferSize());
+        LOGGER.trace("Socket info - SO_RCVBUF={}", this.socket.getReceiveBufferSize());
         this.requestHandler = requestHandler;
     }
 
@@ -37,6 +37,9 @@ public class WorkerThread extends Thread {
             response.toOutputStream(this.socket.getOutputStream());
 
             this.socket.close();
+        }
+        catch(NullPointerException e) {
+            LOGGER.warn("Nothing to read", e);
         }
         catch(IOException e) {
             LOGGER.error("An error occurred while handling request", e);
