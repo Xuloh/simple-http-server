@@ -19,7 +19,6 @@ public class Server {
             RequestHandler requestHandler = createRequestHandler();
             while(true) {
                 Socket socket = serverSocket.accept();
-                socket.setSoTimeout(1000);
                 new WorkerThread(socket, requestHandler).start();
             }
         }
