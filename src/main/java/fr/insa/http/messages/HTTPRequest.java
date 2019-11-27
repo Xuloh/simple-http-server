@@ -5,13 +5,16 @@ import fr.insa.http.enums.HTTPVersion;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.xml.crypto.Data;
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.SocketTimeoutException;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 
 public class HTTPRequest extends HTTPMessage {
     private static final Logger LOGGER = LogManager.getLogger(HTTPRequest.class);
@@ -69,13 +72,36 @@ public class HTTPRequest extends HTTPMessage {
     @Override
     public void fromInputStream(InputStream in) throws IOException {
         this.clear();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 
-        String line = reader.readLine();
-        int firstIdx = line.indexOf(' ');
-        int lastIdx = line.lastIndexOf(' ');
+        DataInputStream dataIn = new DataInputStream(in);
+        ArrayList<Byte> bufferL = new ArrayList<>();
+        bufferL.add(dataIn.readByte());
+        bufferL.add(dataIn.readByte());
+        bufferL.add(dataIn.readByte());
+        bufferL.add(dataIn.readByte());
+        boolean stop = false;
 
+        while(!stop) {
+            int len = bufferL.size();
+            if(bufferL.get(len - 1) == '\n' && bufferL.get(len - 2) == '\r' && bufferL.get(len - 3) == '\n' && bufferL.get(len - 4) == '\r')
+                stop = true;
+            else
+                bufferL.add(dataIn.readByte());
+        }
+
+        byte[] buffer = new byte[bufferL.size()];
+        {
+            int count = 0;
+            for(byte b1 : bufferL)
+                buffer[count++] = b1;
+        }
+        BufferedReader reader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(buffer), StandardCharsets.US_ASCII));
+        LOGGER.debug("Data read : {}", new String(buffer, StandardCharsets.US_ASCII));
         try {
+            String line = reader.readLine();
+            int firstIdx = line.indexOf(' ');
+            int lastIdx = line.lastIndexOf(' ');
+
             this.method = HTTPMethod.valueOf(line.substring(0, firstIdx));
             this.resource = line.substring(firstIdx + 1, lastIdx);
             this.version = HTTPVersion.fromString(line.substring(lastIdx + 1));
@@ -97,20 +123,20 @@ public class HTTPRequest extends HTTPMessage {
             if(this.headers.hasHeader("content-length")) {
                 int contentLength = Integer.parseInt(this.headers.getHeader("content-length"));
                 byte[] bodyData = new byte[contentLength];
-                int totalDataReceived = 0;
-                int dataRead;
+                int count = 0;
                 try {
                     do {
-                        dataRead = in.read(bodyData, totalDataReceived, contentLength - totalDataReceived);
-                        if(dataRead > -1)
-                            totalDataReceived += dataRead;
-                        LOGGER.trace("Read {}, total received {}, total needed {}",
-                            dataRead,
-                            totalDataReceived,
-                            contentLength
-                        );
+                        bodyData[count++] = dataIn.readByte();
+//                        dataIn.readNBytes(bodyData, totalDataReceived, contentLength - totalDataReceived);
+//                        if(dataRead > -1)
+//                            totalDataReceived += dataRead;
+//                        LOGGER.trace("Read {}, total received {}, total needed {}",
+//                            dataRead,
+//                            totalDataReceived,
+//                            contentLength
+//                        );
                     }
-                    while(dataRead > 0);
+                    while(count < contentLength);
                 }
                 catch(SocketTimeoutException ignored) {}
 //                if(totalDataReceived != contentLength)
@@ -144,7 +170,7 @@ public class HTTPRequest extends HTTPMessage {
             stringBuilder.append(header).append(':').append(this.headers.getHeader(header)).append("\r\n");
         stringBuilder.append("\r\n");
 
-        byte[] data = stringBuilder.toString().getBytes();
+        byte[] data = stringBuilder.toString().getBytes(StandardCharsets.US_ASCII);
         out.write(data, 0, data.length);
 
         if(this.body != null) {
