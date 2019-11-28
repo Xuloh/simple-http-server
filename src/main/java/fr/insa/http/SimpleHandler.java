@@ -125,6 +125,38 @@ public class SimpleHandler {
         }
     }
 
+    @HandleMethod(HTTPMethod.PUT)
+    public HTTPResponse handlePut(HTTPRequest request) {
+        String resource = request.getResource();
+
+        try {
+            if("/".equals(resource)) {
+                HTTPResponse response = new HTTPResponse(HTTPStatus.MOVED_PERMANENTLY);
+                response.getHeaders().setHeader("location", "/index.html");
+                return response;
+            }
+            else if("/gif-gallery.html".equals(resource)) {
+                return new HTTPResponse(HTTPStatus.METHOD_NOT_ALLOWED);
+            }
+            else {
+                File file = new File(this.root + resource);
+                if(!file.exists()){
+                    return new HTTPResponse(HTTPStatus.NOT_FOUND);
+                }
+                String contentType = this.getFileContentType(this.root + resource);
+                if(contentType != null && !contentType.equals(request.getHeaders().getHeader("content-type"))) {
+                    return new HTTPResponse(HTTPStatus.BAD_REQUEST);
+                }
+                byte[] data = request.getBody();
+                this.writeToFile(this.root + resource, data);
+                return new HTTPResponse(HTTPStatus.OK);
+            }
+        }
+        catch(NullPointerException | IOException e) {
+            return this.notFound();
+        }
+    }
+
     private byte[] readFile(String path) throws IOException {
         File requestedFile = new File(path);
         if(!requestedFile.exists() || !requestedFile.canRead())
