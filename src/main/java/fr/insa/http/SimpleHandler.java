@@ -15,10 +15,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.zip.GZIPInputStream;
 
 @HTTPHandler
@@ -152,7 +149,43 @@ public class SimpleHandler {
                 return new HTTPResponse(HTTPStatus.OK);
             }
         }
+        catch(NoSuchElementException e){
+            return new HTTPResponse(HTTPStatus.BAD_REQUEST);
+        }
         catch(NullPointerException | IOException e) {
+            return this.notFound();
+        }
+    }
+
+    @HandleMethod(HTTPMethod.DELETE)
+    public HTTPResponse HandleDelete(HTTPRequest request) {
+        String resource = request.getResource();
+
+        try {
+            if("/".equals(resource)) {
+                HTTPResponse response = new HTTPResponse(HTTPStatus.MOVED_PERMANENTLY);
+                response.getHeaders().setHeader("location", "/index.html");
+                return response;
+            }
+            else if("/gif-gallery.html".equals(resource)) {
+                return new HTTPResponse(HTTPStatus.METHOD_NOT_ALLOWED);
+            }
+            else {
+                File file = new File(this.root + resource);
+                if(!file.exists()){
+                    return new HTTPResponse(HTTPStatus.NOT_FOUND);
+                }
+                if(!file.delete()){
+                    HTTPResponse response = new HTTPResponse(HTTPStatus.INTERNAL_SERVER_ERROR);
+                    response.setBody("<h1>The file could not be deleted</h1>");
+                }
+                return new HTTPResponse(HTTPStatus.OK);
+            }
+        }
+        catch(NoSuchElementException e){
+            return new HTTPResponse(HTTPStatus.BAD_REQUEST);
+        }
+        catch(NullPointerException e) {
             return this.notFound();
         }
     }
