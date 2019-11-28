@@ -85,6 +85,46 @@ public class SimpleHandler {
         return this.notFound();
     }
 
+    @HandleMethod(HTTPMethod.HEAD)
+    public HTTPResponse handleHead(HTTPRequest request) {
+        String resource = request.getResource();
+
+        try {
+            if("/".equals(resource)) {
+                HTTPResponse response = new HTTPResponse(HTTPStatus.MOVED_PERMANENTLY);
+                response.getHeaders().setHeader("location", "/index.html");
+                return response;
+            }
+            else if("/gif-gallery.html".equals(resource)) {
+                byte[] data = this.readFile(this.root + resource);
+                File gifDir = new File(this.root + "/gif");
+                StringBuilder stringBuilder = new StringBuilder();
+                Arrays.stream(Objects.requireNonNull(gifDir.list()))
+                        .map(filename -> "<img src=\"/gif/" + filename + "\"/>")
+                        .forEach(stringBuilder::append);
+                stringBuilder.append("</div></body></html>");
+                byte[] moreData = stringBuilder.toString().getBytes();
+                byte[] allTheData = Util.concatenateArrays(data, moreData);
+
+                HTTPResponse response = new HTTPResponse(HTTPStatus.OK);
+                response.getHeaders().setHeader("length", Integer.toString(allTheData.length));
+                return response;
+            }
+            else {
+                byte[] data = this.readFile(this.root + resource);
+                String contentType = this.getFileContentType(this.root + resource);
+                HTTPResponse response = new HTTPResponse(HTTPStatus.OK);
+                if(contentType != null)
+                    response.getHeaders().setHeader("content-type", contentType);
+                response.getHeaders().setHeader("length", Integer.toString(data.length));
+                return response;
+            }
+        }
+        catch(NullPointerException | IOException e) {
+            return this.notFound();
+        }
+    }
+
     private byte[] readFile(String path) throws IOException {
         File requestedFile = new File(path);
         if(!requestedFile.exists() || !requestedFile.canRead())
