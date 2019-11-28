@@ -53,7 +53,7 @@ public class SimpleHandler {
                 byte[] allTheData = Util.concatenateArrays(data, moreData);
 
                 HTTPResponse response = new HTTPResponse(HTTPStatus.OK);
-                response.getHeaders().setHeader("length", Integer.toString(allTheData.length));
+                response.getHeaders().setHeader("content-length", Integer.toString(allTheData.length));
                 response.setBody(allTheData);
                 return response;
             }
@@ -63,7 +63,7 @@ public class SimpleHandler {
                 HTTPResponse response = new HTTPResponse(HTTPStatus.OK);
                 if(contentType != null)
                     response.getHeaders().setHeader("content-type", contentType);
-                response.getHeaders().setHeader("length", Integer.toString(data.length));
+                response.getHeaders().setHeader("content-length", Integer.toString(data.length));
                 response.setBody(data);
                 return response;
             }
@@ -107,7 +107,7 @@ public class SimpleHandler {
                 byte[] allTheData = Util.concatenateArrays(data, moreData);
 
                 HTTPResponse response = new HTTPResponse(HTTPStatus.OK);
-                response.getHeaders().setHeader("length", Integer.toString(allTheData.length));
+                response.getHeaders().setHeader("content-length", Integer.toString(allTheData.length));
                 return response;
             }
             else {
@@ -116,7 +116,7 @@ public class SimpleHandler {
                 HTTPResponse response = new HTTPResponse(HTTPStatus.OK);
                 if(contentType != null)
                     response.getHeaders().setHeader("content-type", contentType);
-                response.getHeaders().setHeader("length", Integer.toString(data.length));
+                response.getHeaders().setHeader("content-length", Integer.toString(data.length));
                 return response;
             }
         }
