@@ -1,4 +1,4 @@
-# Simple HTTP Server
+# Simple HTTP Server
 
 ## How to run
 
