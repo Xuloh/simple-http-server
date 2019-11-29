@@ -1,0 +1,40 @@
+body {
+    background-color: #EEE;
+    color: #444;
+}
+
+h1 {
+    font-size: 15px;
+    color: #26c281;
+}
+
+p {
+    font-style: italic;
+}
+
+p:last-child {
+    border-bottom: #444 dotted 1px;
+}
+
+#lorem::after {
+    content: "Unknown author - circa 400 BC";
+}
+
+span {
+    font-size: 7px;
+}
+
+input {
+    margin: 5px;
+}
+
+#error {
+    color: #e74c3c;
+    font-size: 15px;
+}
+
+#gallery {
+    margin: 5px;
+    display: flex;
+    flex-wrap: wrap;
+}

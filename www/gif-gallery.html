@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Da GIF gallery</title>
+    <meta charset="UTF-8"/>
+    <link rel="stylesheet" type="text/css" href="style.css"/>
+</head>
+<body>
+<script src="gif-gallery.js"></script>
+
+<h1>GIF Galery</h1>
+
+<a href="index.html">Go back to index</a>
+
+<form method="post" id="form" action="/gif" enctype="multipart/form-data">
+    <label for="file">File : </label>
+    <input id="file" type="file" required/>
+    <span id="error"></span>
+    <br/>
+    <button type="submit">
+        Lets gooooo
+    </button>
+</form>
+
+<div id="gallery">
