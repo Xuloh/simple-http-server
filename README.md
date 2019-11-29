@@ -10,6 +10,5 @@ Building and running requires [JDK 13](https://www.oracle.com/technetwork/java/j
 - Linux : `./gradlew run`
 
 The server listens for requests on port 8080.
+
 The server serves static files from the `www` directory located in its running directory.
-
-
