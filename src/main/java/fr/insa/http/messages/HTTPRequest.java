@@ -16,6 +16,9 @@ import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
+/**
+ * Class that represents an http request, allows for easy manipulation of all the data of the request
+ */
 public class HTTPRequest extends HTTPMessage {
     private static final Logger LOGGER = LogManager.getLogger(HTTPRequest.class);
 
@@ -69,6 +72,9 @@ public class HTTPRequest extends HTTPMessage {
         return "Request{" + "method=" + method + ", version=" + version + ", resource='" + resource + '\'' + ", headers=" + headers + ", body='" + body + '\'' + '}';
     }
 
+    /**
+     * Resets all the attributes of this instance and populates them with data read from the given InputStream
+     */
     @Override
     public void fromInputStream(InputStream in) throws IOException {
         this.clear();
@@ -149,6 +155,9 @@ public class HTTPRequest extends HTTPMessage {
         }
     }
 
+    /**
+     * Writes a proper http request to the given OutputStream
+     */
     @Override
     public void toOutputStream(OutputStream out) throws IOException {
         if(this.method == null)

@@ -11,6 +11,7 @@ public class Server {
     private static final Logger LOGGER = LogManager.getLogger(Server.class);
 
     public static void main(String[] args) {
+        // sets proper line separator according to http specification
         System.setProperty("line.separator", "\r\n");
         int port = 8080;
         LOGGER.info("Starting server on port {}", port);

@@ -1,5 +1,8 @@
 package fr.insa.http.util;
 
+/**
+ * Some utility methods to handle byte arrays
+ */
 public final class Util {
     public static byte[] concatenateArrays(byte[] a1, int offset1, int length1, byte[] a2, int offset2, int length2) {
         byte[] all = new byte[length1 + length2];

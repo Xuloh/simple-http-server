@@ -12,6 +12,9 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * Class that represents an http response, allows for easy manipulation of all the data of the response
+ */
 public class HTTPResponse extends HTTPMessage {
     private static final Logger LOGGER = LogManager.getLogger(HTTPResponse.class);
 
@@ -46,6 +49,9 @@ public class HTTPResponse extends HTTPMessage {
         return "Response{" + "version=" + version + ", status=" + status + ", headers=" + headers + ", body='" + body + '\'' + '}';
     }
 
+    /**
+     * Resets all the attributes of this instance and populates them with data read from the given InputStream
+     */
     @Override
     public void fromInputStream(InputStream in) throws IOException {
         this.clear();
@@ -85,6 +91,9 @@ public class HTTPResponse extends HTTPMessage {
         }
     }
 
+    /**
+     * Writes a proper http response to the given OutputStream
+     */
     @Override
     public void toOutputStream(OutputStream out) throws IOException {
         if(this.version == null)

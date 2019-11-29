@@ -7,6 +7,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+/**
+ * Abstract superclass that represents an HTTPMessage
+ * Subclassed by HTTPRequest and HTTPResponse
+ */
 public abstract class HTTPMessage {
     public static HTTPVersion defaultVersion = HTTPVersion.HTTP1;
 

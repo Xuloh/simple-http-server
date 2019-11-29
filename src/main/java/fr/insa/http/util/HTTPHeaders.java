@@ -6,6 +6,9 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
+/**
+ * A simple wrapper class for a map holding http headers that ensures validity of the headers
+ */
 public class HTTPHeaders {
     private Map<String, String> headers;
 
